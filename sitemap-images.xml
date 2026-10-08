@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://octavestreaming.com/</loc>
+    <image:image>
+      <image:loc>https://octavestreaming.com/brand/og.png</image:loc>
+      <image:title>Octave — Premium music, always free</image:title>
+      <image:caption>Octave is a beautiful, free music streaming experience.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://octavestreaming.com/brand/OctaveBanner.png</image:loc>
+      <image:title>Octave</image:title>
+      <image:caption>The Octave brand lockup.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://octavestreaming.com/brand/white_logo.png</image:loc>
+      <image:title>Octave logo</image:title>
+      <image:caption>The Octave mark.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://octavestreaming.com/shots/mobile.webp</image:loc>
+      <image:title>Octave on a phone</image:title>
+      <image:caption>Octave&apos;s mobile home, with shelves built from what you actually play.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://octavestreaming.com/shots/desktop.webp</image:loc>
+      <image:title>Octave on the web</image:title>
+      <image:caption>Browse and play millions of songs in Octave on desktop.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://octavestreaming.com/shots/phone.webp</image:loc>
+      <image:title>Now Playing on Octave for iPhone</image:title>
+      <image:caption>The native iOS player, coloured by the album and showing synced lyrics.</image:caption>
+    </image:image>
+  </url>
+</urlset>

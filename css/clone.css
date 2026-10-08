@@ -1,0 +1,82 @@
+/* ============================================================================
+   Octave clone — glue stylesheet.
+   Everything visual lives in the three vendored sheets:
+     fonts.css    self-hosted Mona Sans / JetBrains Mono / Inter @font-face
+     tailwind.css compiled Tailwind v4 output (the site's own stylesheet)
+     v2.css       the hand-written .v2-* component layer
+   This file only adds what the original got from GSAP + a small amount of
+   progressive-enhancement scaffolding. No colour/typography tokens are
+   redefined here on purpose.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- pinning
+   ScrollTrigger's `pin` is replaced by a fixed-position child inside a wrapper
+   whose height carries the pin distance (GSAP `end: "+=NN%"`). JS toggles
+   `.v2-pin-on`; without JS the section just sits in normal flow.             */
+.v2-pin { position: relative; padding-bottom: calc(var(--pin, 0) * 100svh); }
+.v2-pinme.v2-pin-live { position: absolute; top: 0; left: 0; right: 0; }
+.v2-pinme.v2-pin-on { position: fixed; top: 0; left: 0; right: 0; }
+@media (max-width: 767px) {
+  .v2-pin[style*="--pin:1.6"] { --pin: 1.2; }
+}
+
+/* elements GSAP would have set inline before painting ---------------------- */
+.invisible { visibility: hidden; }
+.no-js .invisible, .is-ready .invisible { visibility: visible; }
+
+/* scroll-linked state that only exists while JS is running */
+.v2-hero-veil, .v2-hero-fade, .v2-hero-title { will-change: transform, opacity; }
+.v2-lyric-line { will-change: transform, opacity, filter; }
+.v2-pal-item, .v2-tier { will-change: transform, opacity; }
+.v2-vocals-fill, .v2-lyric-bar { transform: scaleX(1); }
+.v2-lyric-bar { transform: scaleX(0); }
+.v2-vocals-thumb { left: 100%; }
+
+/* hidden-by-default extra rows (accordion / "Show all 51") */
+.v2-dl-more[hidden] { display: none !important; }
+
+/* ------------------------------------------------------- hero cover wall
+   WebGL is not reproduced; this is the site's own grayscale grid fallback,
+   given the same slow parallax drift the canvas used to get from scroll.   */
+.v2-wall { will-change: transform; }
+
+/* --------------------------------------------------------- about marquee */
+.v2-about-strip { animation: octave-marquee 44s linear infinite; will-change: transform; }
+@keyframes octave-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* ------------------------------------------------------- 404 (Next-style) */
+.nf {
+  min-height: 100svh; display: flex; align-items: center; justify-content: center;
+  background: #fff; color: #000; padding: 2rem;
+}
+.nf-row { display: flex; align-items: center; gap: 1.25rem; }
+.nf-code {
+  font: 600 2rem/1 var(--font-mona), -apple-system, system-ui, sans-serif;
+  letter-spacing: -0.04em; padding-right: 1.25rem;
+  border-right: 1px solid #e5e5e5; white-space: nowrap;
+}
+.nf-msg { max-width: 42rem; }
+.nf-title { font: 500 1rem/1.5 var(--font-mona), -apple-system, system-ui, sans-serif; }
+.nf-body { display: none; }
+.nf-link { display: none; }
+@media (max-width: 640px) {
+  .nf-code { font-size: 1.5rem; }
+}
+
+/* --------------------------------------------------------- reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .v2-about-strip { animation: none; }
+  .v2-wall { transform: none !important; }
+  .v2-grain { animation: none; }
+  .v2-lw { --p: 112%; }
+  .v2-lyrics { height: auto; min-height: 100svh; }
+  .v2-lyrics .v2-lyric-viewport { overflow: visible; -webkit-mask-image: none; mask-image: none; }
+  .v2-palette .v2-pal-track { padding: 0 10vw; overflow-x: auto; }
+}
+
+/* ------------------------------------------------------------- utilities */
+.copy-flash { background-color: rgba(255, 255, 255, 0.08) !important; }
+.vis-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
