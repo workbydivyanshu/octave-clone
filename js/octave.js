@@ -616,18 +616,29 @@
     paint(0, 0);
 
     if (RM) return;
+    /* The original timeline is `.to({},{duration:.3})` then, per step,
+       `.to(track,{x,duration:1}) … .to({},{duration:.35})`. The trailing .35
+       already sits *inside* each of the (n-1) steps, so the timeline's total
+       duration is `.3 + (n-1)*1.35` — adding a further `+ .35` here made the
+       whole carousel run 6.1% fast, leaving the cover a quarter-step ahead of
+       the colour repaint at every scroll depth. */
     var HEAD = 0.3, STEP = 1.35;
+    var TLEN = HEAD + (n - 1) * STEP;
     var sm = smoother(0.6);
     onScroll(function (dt) {
       var p = sm(pinProgress(pin), dt);
-      var T = p * (HEAD + (n - 1) * STEP + 0.35);
+      var T = p * TLEN;
       var k = clamp((T - HEAD) / STEP, 0, n - 1);
       var idx = Math.min(n - 2, Math.floor(k));
       var f = k - idx;
       var fx = E.power3inOut(f), fv = E.power1inOut(f);
       track.style.transform = 'translate3d(' + lerp(xFor(idx), xFor(idx + 1), fx).toFixed(2) + 'px,0,0)';
-      items[idx].style.transform = 'scale(' + lerp(0.62, 1, fx).toFixed(4) + ')';
-      items[idx].style.opacity = String(lerp(0.55, 1, fx));
+      /* Outgoing cover shrinks 1 -> .62, incoming grows .62 -> 1. The original
+         timeline tweens `l[t-1]` toward `.62` and `l[t]` toward `1` over the same
+         second, i.e. they move in opposite directions; scaling both up by `fx`
+         left every tile at .62 whenever the scrub sat at a step boundary. */
+      items[idx].style.transform = 'scale(' + lerp(1, 0.62, fx).toFixed(4) + ')';
+      items[idx].style.opacity = String(lerp(1, 0.55, fx));
       items[idx + 1].style.transform = 'scale(' + lerp(0.62, 1, fx).toFixed(4) + ')';
       items[idx + 1].style.opacity = String(lerp(0.55, 1, fx));
       paint(idx, fv);

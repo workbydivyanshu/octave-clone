@@ -16,8 +16,17 @@
 .v2-pin { position: relative; padding-bottom: calc(var(--pin, 0) * 100svh); }
 .v2-pinme.v2-pin-live { position: absolute; top: 0; left: 0; right: 0; }
 .v2-pinme.v2-pin-on { position: fixed; top: 0; left: 0; right: 0; }
+/* Narrow-viewport pin distance for the platform-grid section.
+   The wrapper carries `--pin` as an *inline* declaration, and an inline custom
+   property outranks any author rule regardless of selector — so a plain
+   `.v2-pin-lg { --pin: 1.2 }` media query silently loses, and the old
+   `[style*="--pin:1.6"]` attribute selector additionally stopped matching the
+   moment `initPins()` reserialised the attribute to `--pin: 1.6; …` (with a
+   space). `!important` is the only thing that actually overrides the inline
+   declaration; `.v2-pin-lg` is the stable hook (JS never touches className on
+   the wrapper). This is what took index@390 from 20594px down to 20256px. */
 @media (max-width: 767px) {
-  .v2-pin[style*="--pin:1.6"] { --pin: 1.2; }
+  .v2-pin-lg { --pin: 1.2 !important; }
 }
 
 /* elements GSAP would have set inline before painting ---------------------- */
