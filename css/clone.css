@@ -45,9 +45,37 @@
 .v2-dl-more[hidden] { display: none !important; }
 
 /* ------------------------------------------------------- hero cover wall
-   WebGL is not reproduced; this is the site's own grayscale grid fallback,
-   given the same slow parallax drift the canvas used to get from scroll.   */
+   The original paints this wall with a WebGL `CoverWall` (three.js). Its
+   fragment shader is the spec:
+
+     float spot = 1. - smoothstep(uSpot*.15, uSpot, d);
+     float sat  = clamp(uSat + spot + uHover, 0., 1.);
+     col = mix(vec3(dot(col, luma)), col, sat);
+     col *= clamp(uDim + spot*(1.-uDim) + uHover, 0., 1.);
+
+   so the wall rests desaturated and dimmed (uSat = 0, uDim = .26 at hero
+   progress 0) and a mouse-trailed radial glow lifts a disc of it back to
+   full colour and full brightness. `mix(gray, rgb, sat)` has no CSS
+   equivalent for one copy of an image, so the wall is two stacked layers of
+   the same drifting columns: a grayscale + brightness(.26) base, and a
+   full-colour copy the spotlight's radial mask reveals.
+
+   The filter lives on the columns rather than the layer so each column's
+   raster is static and only its transform changes frame to frame. */
 .v2-wall { will-change: transform; }
+.v2-wall-stage { position: absolute; inset: 0; overflow: hidden; will-change: transform; }
+.v2-wall-layer { position: absolute; inset: 0; }
+.v2-wall-base .v2-wall-col { filter: grayscale(1) brightness(0.26); }
+.v2-wall-col {
+  position: absolute; background-repeat: no-repeat; will-change: transform;
+}
+.v2-wall-lit {
+  -webkit-mask-image: radial-gradient(circle var(--spot-r, 300px) at var(--spot-x, 50%) var(--spot-y, 50%), #000 0, #000 var(--spot-c, 45px), transparent 100%);
+          mask-image: radial-gradient(circle var(--spot-r, 300px) at var(--spot-x, 50%) var(--spot-y, 50%), #000 0, #000 var(--spot-c, 45px), transparent 100%);
+}
+/* the tile the shader's raycast is over: full colour, full light, +8% scale */
+.v2-wall-hot { position: absolute; display: none; background-repeat: no-repeat; will-change: transform; }
+.v2-wall-hot.v2-wall-hot-on { display: block; }
 
 /* --------------------------------------------------------- about marquee */
 .v2-about-strip { animation: octave-marquee 44s linear infinite; will-change: transform; }
@@ -78,7 +106,7 @@
 /* --------------------------------------------------------- reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .v2-about-strip { animation: none; }
-  .v2-wall { transform: none !important; }
+  .v2-wall-stage { transform: none !important; }
   .v2-grain { animation: none; }
   .v2-lw { --p: 112%; }
   .v2-lyrics { height: auto; min-height: 100svh; }

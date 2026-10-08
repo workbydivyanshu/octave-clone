@@ -382,7 +382,6 @@
     var fades = $$('.v2-hero-fade', sec);
     var ticker = $('.v2-hero-ticker', sec);
     var veil = $('.v2-hero-veil', sec);
-    var wall = $('.v2-wall', sec);
 
     var chars = [];
     if (h1) {
@@ -401,15 +400,8 @@
       } else { h1.style.visibility = 'visible'; fades.forEach(function (f) { f.style.opacity = 1; }); }
     }
 
-    /* hover label over the record wall */
-    if (wall && ticker) {
-      wall.addEventListener('pointermove', function (e) {
-        var t = e.target.closest('img[data-title]');
-        if (t) ticker.innerHTML = '<span class="text-white"><span class="text-[var(--v2-red)]">▶</span> ' +
-          t.dataset.title + ' — ' + t.dataset.artist + '</span>';
-      });
-      wall.addEventListener('pointerleave', function () { ticker.textContent = 'Hover a record'; });
-    }
+    /* hover label + spotlight + drifting columns over the record wall */
+    initWall(sec, ticker);
 
     var pin = sec.closest('.v2-pin');
     if (!pin) return;
@@ -431,11 +423,257 @@
       fades.forEach(function (f) { f.style.opacity = String(1 - fu); f.style.transform = 'translateY(' + (-30 * fu) + 'px)'; });
       if (ticker) ticker.style.opacity = String(1 - clamp(cT / 0.2, 0, 1));
       if (veil) veil.style.opacity = String(clamp((cT - 0.7) / 0.3, 0, 1));
-      if (wall) {
-        var y = window.pageYOffset;
-        wall.style.transform = 'translate3d(0,' + (p * -60 + Math.max(-40, Math.min(40, velocity * 0.4))) + 'px,0)';
-      }
     });
+  }
+
+  /* ================================================================= HERO WALL
+     Port of the original's WebGL `CoverWall` (three.js, captured in the home
+     chunk). Only two things in it are visible in the DOM, and both are here:
+     the perpetual per-column marquee and the mouse-trailed spotlight.
+
+         col.offset += (col.speed + .9*vel*sign(col.speed)) * dt * (1 + 1.5*p)
+         col.speed   = (k % 2 ? -1 : 1) * (.16 + k % 3 * .035)   world units/s
+
+     with `vel` the smoothed scrollState.velocity/22 the shader clamps to ±2.2,
+     and the wrap `(baseY + offset) % colLen`. One world unit is
+     `vh / (2 tan(16°) * 12)` px, which is what converts those speeds to the
+     ~21 / 25.5 / 30 px/s the wall actually runs at on a 1440×900 hero.       */
+  var WALL_TAN = Math.tan(32 * Math.PI / 360);   // tan(fov/2), fov = 32
+  var WALL_VIEW_Z = 12;                           // camera z once the intro tween lands
+  var WALL_SPOT = 0.24;    // uSpot = .24 * max(width, height)
+  var WALL_CORE = 0.15;    // inner plateau of the glow's smoothstep
+
+  function initWall(sec, ticker) {
+    var stage = $('.v2-wall-stage', sec);
+    var grid = $('.v2-wall', sec);
+    if (!stage || !grid) return;
+    var covers = $$('img[data-title]', grid).map(function (im) {
+      return { src: im.getAttribute('src'), t: im.dataset.title, a: im.dataset.artist };
+    });
+    if (!covers.length) return;
+
+    /* the canvas equivalent: two copies of the same columns, one revealed by
+       the spotlight mask. `grid` is the site's own no-WebGL fallback and is
+       only kept alive for the no-JS case. */
+    var base = doc.createElement('div'); base.className = 'v2-wall-layer v2-wall-base';
+    var lit = doc.createElement('div'); lit.className = 'v2-wall-layer v2-wall-lit';
+    var hot = doc.createElement('div'); hot.className = 'v2-wall-hot';
+    stage.insertBefore(base, grid); stage.insertBefore(lit, grid); stage.insertBefore(hot, grid);
+    grid.parentNode.removeChild(grid);
+
+    var pin = sec.closest('.v2-pin');
+    var vw = 0, vh = 0, r = 0, colW = 0, pitch = 0, colLen = 0, depth = 0;
+    var cols = [];
+    var mx = 0, my = 0, sx = 0, sy = 0, pax = 0, pay = 0, ty = 0;
+    var ppersp = 1000, pcosx = 1, psinx = 0, pcosy = 1, psiny = 0;
+    var slots = 0;
+    var hasMouse = false, clock = 0, vel = 0, progress = 0, live = true;
+    var hk = -1, hamt = 0, hcov = null;
+
+    function colX(k) { return (k - (r + 1) / 2) * pitch; }
+
+    function build() {
+      vw = sec.clientWidth; vh = sec.clientHeight;
+      if (!vw || !vh) return;
+
+      /* build() sizes the columns for the camera's *intro* framing
+         (z = 12 + (1-intro)*3 = 15) but frame() renders at z = 12 once the
+         2.4s intro tween lands, so the wall settles 15/12 = 1.25x larger
+         than the plain `vw / (cols - 1.2)` — which is the 230.8px pitch,
+         214.6px tile and 16.2px gutter the live wall measures at 1440x900. */
+      r = vw < 700 ? 5 : vw < 1100 ? 7 : 9;
+      pitch = 1.25 * vw / (r - 1.2);
+      colW = 0.93 * pitch;                                    // this.tile
+      depth = Math.ceil((r - 1.2) * vh / vw) + 4;             // this.colLen / a
+      colLen = depth * pitch;
+      var pxPerWorld = vh / (2 * WALL_TAN * WALL_VIEW_Z);
+      slots = Math.ceil((vh + 140 + colLen - colW) / pitch) + 3;
+      /* the parallax is the shader's group tilt: rotation.x += .05*parallax.y,
+         rotation.y = .07*parallax.x, seen through a camera 12 world units
+         back. Kept as a real 3D transform because it compresses the side the
+         pointer is on rather than sliding the whole wall. */
+      ppersp = 12 * pxPerWorld;
+
+      lit.style.setProperty('--spot-r', (WALL_SPOT * Math.max(vw, vh)).toFixed(1) + 'px');
+      lit.style.setProperty('--spot-c', (WALL_CORE * WALL_SPOT * Math.max(vw, vh)).toFixed(1) + 'px');
+      lit.style.setProperty('--spot-x', (vw * 0.5).toFixed(1) + 'px');
+      lit.style.setProperty('--spot-y', (vh * 0.5).toFixed(1) + 'px');
+
+      /* one background layer per slot so a column is a single element whose
+         raster is static and only its transform changes frame to frame; slots
+         repeat every `depth` tiles, which is what makes translating by
+         colLen seamless. */
+      var pos = [], size = colW.toFixed(2) + 'px ' + colW.toFixed(2) + 'px';
+      var hCss = ((slots - 3) * pitch + colW).toFixed(2) + 'px';
+      for (var j = 0; j < slots; j++) pos.push('center ' + ((j - 2) * pitch).toFixed(2) + 'px');
+      while (cols.length) { var old = cols.pop(); old.a.remove(); old.b.remove(); }
+      for (var k = 0; k < r + 2; k++) {
+        var ims = [];
+        for (var j2 = 0; j2 < slots; j2++) ims.push('url("' + coverAt(j2, k).src + '")');
+        var css = 'left:' + colX(k).toFixed(2) + 'px;top:0;width:' + colW.toFixed(2) + 'px;height:' +
+          hCss + ';background-image:' + ims.join(',') + ';background-size:' + size +
+          ';background-position:' + pos.join(',') + ';';
+        var a = doc.createElement('div'), b = doc.createElement('div');
+        a.className = b.className = 'v2-wall-col';
+        a.style.cssText = css; b.style.cssText = css;
+        base.appendChild(a); lit.appendChild(b);
+        cols.push({
+          a: a, b: b, y: 0,
+          off: Math.random() * colLen,                        // the shader's random phase
+          speed: (k % 2 ? -1 : 1) * (0.16 + (k % 3) * 0.035) * pxPerWorld
+        });
+      }
+      hot.style.width = hot.style.height = colW.toFixed(2) + 'px';
+      hk = -1; hcov = null; hamt = 0;
+      hot.classList.remove('v2-wall-hot-on');
+    }
+
+    /* the shader's own slot -> cover mapping: covers[(11*col + 5*row +
+       col*row) % len]. It repeats with period `depth`, so slot j and slot
+       j + depth always carry the same cover. */
+    function coverAt(slot, k) {
+      var row = ((((slot - 2) % depth) + depth) % depth);
+      return covers[((11 * k + 5 * row + k * row) % covers.length + covers.length) % covers.length];
+    }
+
+    /* ---- the raycast ----
+       The shader raycasts against its tiles; here the browser already knows
+       where the cursor is, so the tile is found by projecting every slot's
+       centre through the stage's own transform (the same perspective +
+       rotateX/rotateY CSS applies) and taking the nearest. That stays exact
+       under the 3D parallax instead of assuming a flat plane. */
+    function project(lx, ly) {
+      var cx = vw / 2, cy = vh / 2;
+      var X = lx - cx, Y = ly + ty - cy;
+      var y1 = Y * pcosx, z1 = Y * psinx;
+      var x2 = X * pcosy + z1 * psiny, z2 = -X * psiny + z1 * pcosy;
+      var w = 1 - z2 / ppersp;
+      return [cx + x2 / w, cy + y1 / w];
+    }
+    function hit() {
+      if (!hasMouse || progress >= 0.15 || Math.abs(vel) >= 0.5 || !cols.length) return null;
+      var best = null, bestD = Infinity;
+      for (var k = 0; k < cols.length; k++) {
+        var c = cols[k];
+        var lx = colX(k) + colW / 2;
+        for (var j = 0; j < slots; j++) {
+          var s = project(lx, (j - 2) * pitch + c.y + colW / 2);
+          var dx = s[0] - mx, dy = s[1] - my, d = dx * dx + dy * dy;
+          if (d < bestD) { bestD = d; best = { k: k, j: j, sx: s[0], sy: s[1] }; }
+        }
+      }
+      if (!best) return null;
+      /* the slot's own square: a tile spans [n, n + .93) of the pitch */
+      if (Math.abs(mx - best.sx) >= colW / 2 || Math.abs(my - best.sy) >= colW / 2) return null;
+      return best;
+    }
+
+    function paint() {
+      for (var k = 0; k < cols.length; k++) {
+        var y = cols[k].off % colLen; if (y < 0) y += colLen;
+        cols[k].y = -y;
+        var t3 = 'translate3d(0,' + cols[k].y.toFixed(2) + 'px,0)';
+        cols[k].a.style.transform = t3; cols[k].b.style.transform = t3;
+      }
+    }
+
+    function setHot(h) {
+      if (!h) {
+        hot.classList.remove('v2-wall-hot-on');
+        if (ticker && hcov) ticker.textContent = 'Hover a record';
+        hk = -1; hcov = null;
+        return;
+      }
+      hk = h.k;
+      var c = coverAt(h.j, h.k);
+      if (c !== hcov) {
+        hcov = c;
+        hot.style.backgroundImage = 'url("' + c.src + '")';
+        if (ticker) ticker.innerHTML = '<span class="text-white"><span class="text-[var(--v2-red)]">▶</span> ' +
+          c.t + ' — ' + c.a + '</span>';
+      }
+      hot.style.left = colX(h.k).toFixed(2) + 'px';
+      hot.style.top = ((h.j - 2) * pitch + cols[h.k].y).toFixed(2) + 'px';
+      hot.classList.add('v2-wall-hot-on');
+    }
+
+    /* ---- frame: the shader's own per-frame loop ---- */
+    var last = 0;
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!live || doc.hidden) { last = now; return; }
+      var dt = last ? Math.min(now - last, 50) : 16;
+      last = now;
+      clock += dt / 1000;
+      vel += (clamp(velocity / 22, -2.2, 2.2) - vel) * 0.08;
+
+      /* spotlight: trails the pointer, otherwise wanders the shader's
+         Lissajous idle path (periods 2π/.33 ≈ 19s and 2π/.27 ≈ 23s). */
+      var gx, gy, follow;
+      if (hasMouse) { gx = mx; gy = my; follow = 0.14; }
+      else {
+        gx = vw * (0.5 + 0.3 * Math.sin(0.33 * clock));
+        gy = vh * (0.5 + 0.24 * Math.cos(0.27 * clock));
+        follow = 0.04;
+      }
+      sx += (gx - sx) * follow; sy += (gy - sy) * follow;
+      lit.style.setProperty('--spot-x', sx.toFixed(1) + 'px');
+      lit.style.setProperty('--spot-y', sy.toFixed(1) + 'px');
+
+      /* the wall's parallax: the shader's group tilt, plus the scroll stand-in */
+      pax += ((hasMouse ? mx / vw * 2 - 1 : 0) - pax) * 0.05;
+      pay += ((hasMouse ? my / vh * 2 - 1 : 0) - pay) * 0.05;
+      var rx = pay * 0.05, ry = pax * 0.07;
+      pcosx = Math.cos(rx); psinx = Math.sin(rx);
+      pcosy = Math.cos(ry); psiny = Math.sin(ry);
+      ty = progress * -60 + clamp(velocity * 0.4, -40, 40);
+      stage.style.transform = 'perspective(' + ppersp.toFixed(0) + 'px) rotateY(' +
+        (ry * 57.29578).toFixed(3) + 'deg) rotateX(' + (rx * 57.29578).toFixed(3) +
+        'deg) translate3d(0,' + ty.toFixed(1) + 'px,0)';
+
+      /* columns: the perpetual marquee, faster while the hero is scrolled */
+      var boost = 1 + 1.5 * progress;
+      for (var k = 0; k < cols.length; k++) {
+        var c = cols[k];
+        if (c.off > 1e6 || c.off < -1e6) c.off = c.off % colLen;
+        c.off += (c.speed + 0.9 * vel * (c.speed < 0 ? -1 : 1)) * (dt / 1000) * boost;
+      }
+      paint();
+
+      var h = hit();
+      hamt += ((h ? 1 : 0) - hamt) * 0.12;
+      if (h) setHot(h);
+      else if (hamt > 0.002 || hk >= 0) setHot(null);
+      if (hk >= 0) {
+        /* +8% scale, plus the 0.4u pop toward the camera (12 / 11.6) */
+        hot.style.transform = 'scale(' + (1 + 0.117 * hamt).toFixed(4) + ')';
+      }
+    }
+
+    function onMove(e) {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      var r2 = sec.getBoundingClientRect();
+      mx = e.clientX - r2.left; my = e.clientY - r2.top;
+      hasMouse = true;
+      if (RM) { var h = hit(); setHot(h); if (h) hot.style.transform = 'scale(1.117)'; }
+    }
+    function onLeave() {
+      hasMouse = false;
+      setHot(null);
+    }
+    sec.addEventListener('pointermove', onMove);
+    sec.addEventListener('pointerleave', onLeave);
+
+    onScroll(function () { progress = pin ? pinProgress(pin) : 0; });
+
+    if (window.IntersectionObserver) {
+      new IntersectionObserver(function (en) { live = en[0].isIntersecting; }, { threshold: 0 }).observe(sec);
+    }
+    if (window.ResizeObserver) new ResizeObserver(build).observe(sec);
+
+    build();
+    paint();
+    if (!RM) requestAnimationFrame(frame);
   }
 
   /* ============================================================== MANIFESTO */
