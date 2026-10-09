@@ -59,6 +59,9 @@
   /* Wrap every word (or char) of an element's text in spans, keeping <br>. */
   function walkText(el, cls, perWord) {
     var out = [];
+    // Screen readers would spell out split chars letter-by-letter, so keep
+    // the full text as the accessible name and hide the split spans.
+    var full = (el.textContent || "").trim().replace(/\s+/g, " ");
     (function rec(node) {
       var kids = Array.prototype.slice.call(node.childNodes);
       for (var i = 0; i < kids.length; i++) {
@@ -74,6 +77,7 @@
               var w = doc.createElement('span');
               w.className = cls;
               w.style.display = 'inline-block';
+              w.setAttribute('aria-hidden', 'true');
               w.textContent = p;
               frag.appendChild(w);
               out.push(w);
@@ -83,6 +87,7 @@
                 s.className = cls;
                 s.style.display = 'inline-block';
                 s.style.whiteSpace = 'pre';
+                s.setAttribute('aria-hidden', 'true');
                 s.textContent = p[c];
                 frag.appendChild(s);
                 out.push(s);
@@ -95,6 +100,7 @@
         }
       }
     })(el);
+    if (full) el.setAttribute('aria-label', full);
     return out;
   }
 
