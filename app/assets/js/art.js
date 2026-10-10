@@ -124,11 +124,18 @@
     return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
   }
 
+  function img(url, label, opts) {
+    opts = opts || {};
+    var cls = opts.small ? 'tile tile-sm' : 'tile';
+    return '<span class="' + cls + '"><img src="' + esc(url) + '" alt="" loading="lazy" decoding="async" ' +
+      'style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"></span>';
+  }
+
   function esc(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
 
-  root.OCT_ART = { tile: tile, backdrop: backdrop, ramp: ramp, hash: hash, initials: initials };
+  root.OCT_ART = { tile: tile, backdrop: backdrop, ramp: ramp, hash: hash, initials: initials, img: img };
 })(window);

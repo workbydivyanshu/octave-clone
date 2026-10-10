@@ -9,6 +9,11 @@
   var ctx = OCT.init({ active: 'home' });
   var view = ctx.view;
 
+  var RS = D.realShelves || [];
+  var quick = RS.filter(function (s) { return s.tracks.length; })[0] || null;
+  var partyAlbums = RS.filter(function (s) { return s.albums.length; })[0] || null;
+  var hitsAlbums = RS.filter(function (s) { return s.albums.length; })[1] || null;
+
   var charts = D.tracks.filter(function (t) { return !t.albumId; });
   var topHits = ['t012', 't013', 't201', 't205', 't283', 't113', 't014', 't216', 't297', 't208',
                  't209', 't226', 't271', 't204'].map(function (id) { return D.trackById[id]; });
@@ -87,31 +92,49 @@
     '<section class="shelf" style="margin-top:0">' +
     '<div class="shelf-head"><div class="shelf-title"><h2>Top Picks for You</h2></div></div>' +
     '<div class="hero-grid">' +
-    hero('al-habibti', '', '#1 Today', 'Solar Eclipse', 'Drake', 'album.html?a=al-habibti') +
+    (quick
+      ? hero(quick.tracks[0].id, '', 'Quick pick', quick.tracks[0].title, quick.tracks[0].artist, 'search.html?q=' + encodeURIComponent(quick.tracks[0].artist))
+      : hero('al-habibti', '', '#1 Today', 'Solar Eclipse', 'Drake', 'album.html?a=al-habibti')) +
     hero('pl-liked', '', 'Your Library', 'Liked Songs', 'Playlist', 'library.html?tab=playlists') +
     hero('ps-lightbox', '', 'Listen', 'Podcasts', 'Shows and episodes', 'podcasts.html') +
     hero('pl-wrapped', '', '’26', 'Octave Wrapped', 'Replay what you played', 'wrapped.html') +
     '</div></section>' +
 
-    shelf('Trending everywhere', 'trend',
-      '<div class="card-grid card-grid-6">' +
-      D.trending.map(function (t) {
-        var id = D.tracks.filter(function (x) { return x.title === t[0]; })[0];
-        return pairCard(t[0], t[1], 'charts.html', id ? id.id : t[0]);
-      }).join('') + '</div>',
-      { sub: 'Aggregated from every service scrobbling to Last.fm', seeAll: 'charts.html' }) +
+    (quick
+      ? shelf(quick.title, 'trend', rankedList(quick.tracks.slice(0, 10)), { seeAll: 'charts.html' })
+      : shelf('Trending everywhere', 'trend',
+        '<div class="card-grid card-grid-6">' +
+        D.trending.map(function (t) {
+          var id = D.tracks.filter(function (x) { return x.title === t[0]; })[0];
+          return pairCard(t[0], t[1], 'charts.html', id ? id.id : t[0]);
+        }).join('') + '</div>',
+        { sub: 'Aggregated from every service scrobbling to Last.fm', seeAll: 'charts.html' })) +
 
-    shelf('New Music', 'sparkle',
-      '<div class="card-grid card-grid-6">' +
-      D.newMusic.map(function (t) {
-        var id = D.tracks.filter(function (x) { return x.title === t[0]; })[0];
-        return pairCard(t[0], t[1], 'new.html', id ? id.id : t[0]);
-      }).join('') + '</div>',
-      { sub: 'Fresh drops, handpicked', seeAll: 'new.html' }) +
+    (partyAlbums
+      ? shelf(partyAlbums.title, 'sparkle',
+        '<div class="card-grid card-grid-6">' +
+        partyAlbums.albums.slice(0, 6).map(function (a) {
+          return pairCard(a.title, a.artist, 'album.html?a=' + encodeURIComponent(a.id), a.id);
+        }).join('') + '</div>',
+        { seeAll: 'new.html' })
+      : shelf('New Music', 'sparkle',
+        '<div class="card-grid card-grid-6">' +
+        D.newMusic.map(function (t) {
+          var id = D.tracks.filter(function (x) { return x.title === t[0]; })[0];
+          return pairCard(t[0], t[1], 'new.html', id ? id.id : t[0]);
+        }).join('') + '</div>',
+        { sub: 'Fresh drops, handpicked', seeAll: 'new.html' })) +
 
-    shelf("Today's Top Hits", 'fire',
-      rankedList(topHits),
-      { sub: 'The songs everyone\'s playing', seeAll: 'charts.html' }) +
+    (hitsAlbums
+      ? shelf(hitsAlbums.title, 'fire',
+        '<div class="card-grid card-grid-6">' +
+        hitsAlbums.albums.slice(0, 6).map(function (a) {
+          return pairCard(a.title, a.artist, 'album.html?a=' + encodeURIComponent(a.id), a.id);
+        }).join('') + '</div>',
+        { seeAll: 'charts.html' })
+      : shelf("Today's Top Hits", 'fire',
+        rankedList(topHits),
+        { sub: 'The songs everyone\'s playing', seeAll: 'charts.html' })) +
 
     shelf('Top 100: Global', 'trend',
       '<div class="panel" style="padding:8px 12px"><div class="rows">' +

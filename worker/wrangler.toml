@@ -1,0 +1,6 @@
+name = "aubade-stream"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+# No secrets: guest mode only, no API keys, no account credentials.

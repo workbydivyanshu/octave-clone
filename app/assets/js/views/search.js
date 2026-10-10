@@ -14,7 +14,7 @@
     '<div class="searchbox" id="sb">' + I('search') +
     '<input id="q" type="search" placeholder="Artists, Songs, Lyrics, and More" ' +
     'value="' + esc(params.get('q') || '') + '" aria-label="Search" autocomplete="off">' +
-    '<span class="sb-actions"><button class="icon-btn" id="sbMic" aria-label="Search with your voice">' + I('mic') + '</button>' +
+    '<span class="sb-actions">' +
     '<button class="icon-btn" id="sbClear" aria-label="Clear" hidden>' + I('x') + '</button></span></div>' +
     '<div id="drop" style="position:relative"></div>' +
     '<div id="results"></div>' +
@@ -91,7 +91,7 @@
           esc(t) + '</button>';
       }).join('') + '</div>' +
       '<div style="flex:1"></div>' +
-      '<button class="btn btn-glass" id="filtersBtn">' + I('filter') + 'Filters</button></div>';
+      '</div>';
   }
 
   function resultsHtml() {
@@ -279,20 +279,35 @@
     OCT.$$('[data-tab]', results).forEach(function (b) {
       b.addEventListener('click', function () { activeTab = b.dataset.tab; dropOpen = false; paint(); });
     });
-    var fb = $('#filtersBtn');
-    if (fb) fb.addEventListener('click', function () { OCT.toast('Filters are a live-facet demo — no network in this build'); });
+
   }
 
+  var liveTimer = 0;
+  var lastLive = '';
+  function liveSearch(term) {
+    if (!window.AUB_YTM || !window.AUB_YTM.available()) return;
+    if (term === lastLive) return;
+    lastLive = term;
+    window.AUB_YTM.search(term).then(function (fresh) {
+      if (!fresh.length) return;
+      fresh.forEach(function (t) {
+        if (!D.trackById[t.id]) { D.tracks.push(t); D.trackById[t.id] = t; }
+      });
+      if (input.value.trim().toLowerCase() === term) paint();
+    }).catch(function () {});
+  }
   input.addEventListener('input', function () {
     q = input.value.trim().toLowerCase();
     activeTab = 'Top Results';
     dropOpen = true;
     paint();
+    clearTimeout(liveTimer);
+    if (q.length >= 2) liveTimer = setTimeout(function () { liveSearch(q); }, 250);
   });
   input.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
       var t = input.value.trim();
-      if (t) { q = t.toLowerCase(); dropOpen = false; paint(); }
+      if (t) { q = t.toLowerCase(); dropOpen = false; liveSearch(q); paint(); }
     } else if (e.key === 'Escape') { dropOpen = false; paint(); }
   });
   input.addEventListener('focus', function () {
@@ -301,7 +316,7 @@
   $('#sbClear').addEventListener('click', function () {
     input.value = ''; q = ''; dropOpen = false; paint(); input.focus();
   });
-  $('#sbMic').addEventListener('click', function () { OCT.toast('Voice search needs a mic permission — demo stub'); });
+
   document.addEventListener('mousedown', function (e) {
     if (dropOpen && !e.target.closest('#sb') && !e.target.closest('#drop')) {
       dropOpen = false;

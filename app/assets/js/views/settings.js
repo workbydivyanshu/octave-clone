@@ -71,6 +71,23 @@
     '<input id="sset" type="search" placeholder="Search Settings" aria-label="Search Settings">' +
     '<span class="sb-actions">' + I('mic') + '</span></div>' +
 
+    panel('aubade', 'library', 'Aubade',
+      '<div class="setting"><div class="grow"><div class="setting-label">Music folder</div>' +
+      '<div class="setting-help">Import your local library. Tracks are scanned on this device and stay in this browser.</div></div>' +
+      '<div style="display:flex;gap:8px;align-items:center">' +
+      '<button class="btn btn-glass" id="importBtn">' + I('plus') + 'Import folder</button>' +
+      '<span class="faint t-sm" id="libCount"></span></div></div>' +
+      '<input type="file" webkitdirectory multiple id="importInput" hidden>' +
+      '<div class="setting"><div class="grow"><div class="setting-label">Streaming worker</div>' +
+      '<div class="setting-help">YouTube Music catalog URL via your aubade-stream worker. Local playback works without it.</div></div>' +
+      '<div style="display:flex;gap:8px;align-items:center">' +
+      '<input id="workerUrl" type="url" placeholder="https://aubade-stream.your-name.workers.dev" ' +
+      'style="min-width:240px" class="seg-btn-text" value="' + esc((window.AUB_YTM && window.AUB_YTM.getWorkerUrl()) || '') + '">' +
+      '<button class="btn btn-glass" id="saveWorker">' + I('check') + 'Save</button></div></div>' +
+      '<div class="setting"><div class="grow"><div class="setting-label">Source</div>' +
+      '<div class="setting-help">What this app is currently serving.</div></div>' +
+      '<span class="pill on" id="modeBadge">' + esc((D && D.mode) || 'booting') + '</span></div>') +
+
     '<section class="panel" style="margin-top:20px"><div class="panel-body">' +
     '<div style="display:flex;align-items:center;gap:16px;position:relative">' +
     '<div class="avatar" style="width:52px;height:52px">' + I('user') + '</div>' +
@@ -244,6 +261,45 @@
     '</div></div>';
 
   view.innerHTML = html;
+
+  (function () {
+    function refreshLibraryCount() {
+      window.AUB_STORE.all('tracks').then(function (ts) {
+        var el = $('#libCount');
+        if (el) el.textContent = ts.length ? ts.length + ' tracks in library' : '';
+      });
+    }
+    function refreshMode() {
+      var el = $('#modeBadge');
+      if (el) el.textContent = (D && D.mode) || 'booting';
+    }
+    var ib = $('#importBtn');
+    if (ib) ib.addEventListener('click', function () {
+      if (window.AUB_LIBRARY.usesFsAccess()) {
+        window.AUB_LIBRARY.importFolder().then(function (n) {
+          OCT.toast(n ? 'Imported ' + n + ' new tracks' : 'No new tracks found');
+          refreshLibraryCount(); refreshMode();
+        }).catch(function () { OCT.toast('Import was cancelled'); });
+      } else {
+        $('#importInput').click();
+      }
+    });
+    var ii = $('#importInput');
+    if (ii) ii.addEventListener('change', function () {
+      window.AUB_LIBRARY.importFallback(ii).then(function (n) {
+        OCT.toast(n ? 'Imported ' + n + ' new tracks' : 'No new tracks found');
+        refreshLibraryCount(); refreshMode();
+      });
+    });
+    var sw = $('#saveWorker');
+    if (sw) sw.addEventListener('click', function () {
+      var val = $('#workerUrl').value.trim();
+      window.AUB_YTM.setWorkerUrl(val);
+      OCT.toast(val ? 'Streaming worker saved — reload to apply' : 'Streaming disabled');
+    });
+    refreshLibraryCount();
+    refreshMode();
+  })();
 
   function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-'); }
 

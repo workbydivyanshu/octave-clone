@@ -11,9 +11,16 @@
   var city = params.get('city');
 
   // Ranked list is the demo catalogue, expanded to 100 entries deterministically.
-  var singles = D.tracks.filter(function (t) { return !t.albumId; });
-  var ranked = [];
-  for (var i = 0; i < 100; i++) ranked.push(singles[i % singles.length]);
+  var RS = D.realShelves || [];
+  var realChart = RS.filter(function (s) { return s.tracks.length; })[0];
+  var ranked;
+  if (realChart) {
+    ranked = realChart.tracks;
+  } else {
+    var singles = D.tracks.filter(function (t) { return !t.albumId; });
+    ranked = [];
+    for (var i = 0; i < 100; i++) ranked.push(singles[i % singles.length]);
+  }
 
   function rows(tracks, offset) {
     return '<div class="panel" style="padding:8px 12px"><div class="rows">' +

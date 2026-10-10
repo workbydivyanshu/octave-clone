@@ -900,7 +900,7 @@
     opts = opts || {};
     var href = opts.href || 'album.html?a=' + al.id;
     return '<a class="card" href="' + href + '" data-card-track="' + (al.trackId || '') + '">' +
-      '<div class="card-art">' + A.tile(al.id, al.title) +
+      '<div class="card-art">' + (al.thumb ? A.img(al.thumb, al.title) : A.tile(al.id, al.title)) +
       '<span class="card-hover-play">' + I('play') + '</span></div>' +
       '<div class="card-body"><div class="card-title">' + esc(al.title) + '</div>' +
       '<div class="card-sub">' + esc(al.sub || al.artist || '') + '</div></div></a>';
@@ -911,7 +911,7 @@
     return '<div class="row' + (opts.cols ? ' row-2col' : '') + '" data-track-row="' + t.id + '" data-n="' + (i + 1) + '" tabindex="0">' +
       '<div class="row-idx"><span class="num">' + (i + 1) + '</span></div>' +
       '<div class="row-art" data-play="' + t.id + '" role="button" tabindex="-1" aria-label="Play ' + esc(t.title) + '">' +
-      A.tile(t.albumId || t.id, t.album || t.title, { small: true }) +
+      (t.thumb ? A.img(t.thumb, t.album || t.title, { small: true }) : A.tile(t.albumId || t.id, t.album || t.title, { small: true })) +
       '<span class="card-hover-play" style="width:32px;height:32px;margin:-16px 0 0 -16px">' + I('play') + '</span></div>' +
       '<div class="row-main"><div class="row-title">' + esc(t.title) +
       (t.e ? ' <span class="badge-explicit">E</span>' : '') + '</div>' +
@@ -967,6 +967,7 @@
         e.preventDefault();
         e.stopPropagation();
         var t = D.trackById[c.dataset.cardplay];
+        if (!t) return;
         P.play(t);
         P.setQueue(queueFor(t));
       });

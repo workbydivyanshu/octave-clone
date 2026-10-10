@@ -51,6 +51,10 @@
       }).join('') + '</div></section>';
   }
 
+  var RS = D.realShelves || [];
+  var realSongShelf = RS.filter(function (s) { return s.tracks.length; })[0] || null;
+  var realAlbumShelves = RS.filter(function (s) { return s.albums.length; }).slice(0, 2);
+
   view.innerHTML =
     '<h1>New</h1>' +
 
@@ -66,9 +70,28 @@
     'Live at the O2</div><div class="card-sub">Mollie Elizabeth</div></div></div>' +
     '</div></section>' +
 
-    shelf('Best New Songs', D.editorialShelves['Best New Songs']) +
-    cardShelf('New This Week', D.editorialShelves['New This Week']) +
-    cardShelf('More to Explore', D.editorialShelves['More to Explore']) +
+    (realSongShelf
+      ? '<section class="shelf"><div class="shelf-head"><div class="shelf-title"><h2>' +
+        esc(realSongShelf.title) + '</h2></div></div>' +
+        '<div class="panel" style="padding:8px 12px"><div class="rows">' +
+        realSongShelf.tracks.map(function (t, i) { return OCT.songRow(t, i); }).join('') +
+        '</div></div></section>'
+      : shelf('Best New Songs', D.editorialShelves['Best New Songs'])) +
+
+    (realAlbumShelves.length
+      ? realAlbumShelves.map(function (s) {
+          return '<section class="shelf"><div class="shelf-head"><div class="shelf-title"><h2>' +
+            esc(s.title) + '</h2></div></div><div class="card-grid card-grid-6">' +
+            s.albums.slice(0, 6).map(function (a) {
+              return '<div class="card" role="button" tabindex="0">' +
+                '<div class="card-art">' + A.img(a.thumb, a.title) +
+                '<span class="card-hover-play">' + I('play') + '</span></div>' +
+                '<div class="card-body"><div class="card-title">' + esc(a.title) + '</div>' +
+                '<div class="card-sub">' + esc(a.artist) + '</div></div></div>';
+            }).join('') + '</div></section>';
+        }).join('')
+      : cardShelf('New This Week', D.editorialShelves['New This Week']) +
+        cardShelf('More to Explore', D.editorialShelves['More to Explore'])) +
 
     '<section class="shelf" id="genres"><div class="shelf-head"><div class="shelf-title">' +
     I('hash', 'chev') + '<h2>Genres</h2></div></div>' +
