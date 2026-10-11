@@ -1,14 +1,16 @@
 // Aubade YTM data layer: guest-only YouTube Music via the aubade-stream worker.
 // Shapes map 1:1 onto OCTAVE_DATA track {id,title,artist,album,albumId,dur} +
-// workerUrl in localStorage; no worker configured => available:false and every
-// streaming surface renders its designed empty state (never fake content).
+// workerUrl in localStorage overriding the built-in production default; if the
+// worker is unreachable every streaming surface renders its designed empty
+// state (never fake content).
 (function (root) {
   'use strict';
 
   var URL_KEY = 'aubade.workerUrl';
+  var DEFAULT_URL = 'https://aubade-stream.lifeofdivyu.workers.dev';
 
   function workerUrl() {
-    try { return localStorage.getItem(URL_KEY) || ''; } catch (e) { return ''; }
+    try { return localStorage.getItem(URL_KEY) || DEFAULT_URL; } catch (e) { return DEFAULT_URL; }
   }
   function setWorkerUrl(u) {
     try {

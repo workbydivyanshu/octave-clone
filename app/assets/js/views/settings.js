@@ -79,7 +79,7 @@
       '<span class="faint t-sm" id="libCount"></span></div></div>' +
       '<input type="file" webkitdirectory multiple id="importInput" hidden>' +
       '<div class="setting"><div class="grow"><div class="setting-label">Streaming worker</div>' +
-      '<div class="setting-help">YouTube Music catalog URL via your aubade-stream worker. Local playback works without it.</div></div>' +
+      '<div class="setting-help">YouTube Music via the aubade-stream worker. Built-in default works out of the box; paste your own to override. Local playback needs no worker.</div></div>' +
       '<div style="display:flex;gap:8px;align-items:center">' +
       '<input id="workerUrl" type="url" placeholder="https://aubade-stream.your-name.workers.dev" ' +
       'style="min-width:240px" class="seg-btn-text" value="' + esc((window.AUB_YTM && window.AUB_YTM.getWorkerUrl()) || '') + '">' +
@@ -295,7 +295,7 @@
     if (sw) sw.addEventListener('click', function () {
       var val = $('#workerUrl').value.trim();
       window.AUB_YTM.setWorkerUrl(val);
-      OCT.toast(val ? 'Streaming worker saved — reload to apply' : 'Streaming disabled');
+      OCT.toast(val ? 'Streaming worker saved — reload to apply' : 'Reset to the built-in worker');
     });
     refreshLibraryCount();
     refreshMode();
