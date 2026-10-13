@@ -1,6 +1,5 @@
-/* Account gates — the members-only overlay and the onboarding warm-up
-   dialog, reproduced verbatim as faithful NON-FUNCTIONAL UI. No Discord
-   OAuth, no Turnstile, no account creation, no challenge is attempted. */
+/* Get-Aubade panel — the same card layout, pointed at real artifacts:
+   the Flatpak manifest, the source repo, and the web player. */
 (function () {
   'use strict';
   var OCT = window.OCT;
@@ -10,13 +9,6 @@
   /* The gate pages are intentionally bare — no app shell, matching the
      recon captures where the overlay covers the whole viewport. */
   document.body.style.overflow = 'hidden';
-
-  function turnstile(w) {
-    return '<div class="turnstile" style="' + (w ? 'width:' + w : '') + '">' +
-      '<span class="turnstile-box"></span>' +
-      '<span class="turnstile-txt">Verify you are human</span>' +
-      '<span class="turnstile-logo"><b>CLOUDFLARE</b><u>Privacy</u> · <u>Help</u></span></div>';
-  }
 
   function demoStrip(label) {
     return '<div style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:10000;' +
@@ -29,35 +21,36 @@
 
   if (which === 'members') {
     document.body.innerHTML =
-      '<div class="gate-membersonly" role="dialog" aria-label="Link Discord to unlock Octave">' +
+      '<div class="gate-membersonly" role="dialog" aria-label="Get Aubade">' +
       '<div class="gate-card">' +
       '<div class="gate-left">' +
       '<a class="brand" href="index.html" style="gap:11px;font-size:19px">' +
       '<img class="brand-mark" src="assets/brand/white_logo.png" alt="" width="26" height="26">' +
-      '<span>Octave</span></a>' +
-      '<h1 class="gate-h">Octave is<br>members-only<br>now</h1>' +
-      '<p class="gate-p">Octave is free, lossless, and carries no ads. To keep it that way — and to ' +
-      'stop it being scraped and abused — access is now for our community. It’s free to join, ' +
-      'and it’s how Octave stays alive.</p>' +
+      '<span>Aubade</span></a>' +
+      '<h1 class="gate-h">Aubade is<br>free, for<br>everyone</h1>' +
+      '<p class="gate-p">Aubade is free, and there is no gate — no account, no invite. ' +
+      'Get the Linux app with Flatpak, build it from source, ' +
+      'or open the web player right here.</p>' +
       '<ol class="gate-steps">' +
-      '<li><b>1</b>Join the Octave Discord.</li>' +
-      '<li><b>2</b>Come back and pass the quick human check.</li>' +
-      '<li><b>3</b>Link your Discord — access is granted instantly.</li>' +
+      '<li><b>1</b>Get the Flatpak manifest.</li>' +
+      '<li><b>2</b>Or clone the source.</li>' +
+      '<li><b>3</b>Or open the web player — nothing to install.</li>' +
       '</ol>' +
-      '<p class="gate-built">Built &amp; funded by <u>CloakGPT</u>. Your saved library stays exactly where it is.</p>' +
+      '<p class="gate-built">Free software, built in the open. Your saved library stays exactly where it is.</p>' +
       '</div>' +
       '<div class="gate-right">' +
-      '<div class="gate-rh">Unlock Octave</div>' +
-      '<div class="gate-rs">Two quick steps and you’re back in.</div>' +
-      '<button class="gate-discord" type="button" disabled aria-disabled="true">' +
-      'Join the Octave Discord ↗</button>' +
-      '<div style="display:flex;justify-content:center">' + turnstile() + '</div>' +
-      '<button class="gate-link" type="button" disabled aria-disabled="true" style="margin-top:20px">' +
-      'Link Discord to unlock</button>' +
+      '<div class="gate-rh">Get Aubade</div>' +
+      '<div class="gate-rs">Three real artifacts. Pick one.</div>' +
+      '<a class="gate-cta" href="https://github.com/workbydivyanshu/aubade/blob/main/aubade/flatpak/dev.aubade.Aubade.yml" target="_blank" rel="noopener noreferrer">' +
+      'Get the Flatpak manifest ↗</a>' +
+      '<a class="gate-link" href="https://github.com/workbydivyanshu/aubade" target="_blank" rel="noopener noreferrer" style="margin-top:20px">' +
+      'Browse the source ↗</a>' +
+      '<a class="gate-link" href="index.html" style="margin-top:20px">' +
+      'Open the web player</a>' +
       '<div class="gate-haskey">' + I('key') +
-      '<span>Have an Octave account key? <u style="text-underline-offset:2px">Restore your library</u></span></div>' +
+      '<span>Have an Aubade account key? <u style="text-underline-offset:2px">Restore your library</u></span></div>' +
       '</div></div></div>' +
-      demoStrip('Gate UI reproduced from recon. No Discord OAuth or Turnstile is wired up — no challenge is attempted.');
+      demoStrip('Every button points at a real Aubade artifact — the Flatpak manifest, the source, the web player.');
   } else {
     document.body.innerHTML =
       '<div style="position:fixed;inset:0;overflow:hidden">' +
@@ -65,7 +58,7 @@
       '<div style="padding:32px 40px;opacity:.5">' +
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">' +
       '<img src="assets/brand/white_logo.png" alt="" width="22" height="22">' +
-      '<b>Octave</b></div>' +
+      '<b>Aubade</b></div>' +
       '<h1 style="font-size:36px">Good morning</h1>' +
       '<h2 style="margin-top:28px">Top Picks for You</h2>' +
       '<div style="display:flex;gap:16px;margin-top:16px">' +
@@ -74,12 +67,12 @@
           window.OCT_ART.tile(id, ['Solar Eclipse', 'Liked Songs', 'Podcasts', 'Wrapped'][i]) + '</div>';
       }).join('') + '</div></div></div>' +
 
-      '<div class="gate-onboarding" role="dialog" aria-label="Welcome to Octave">' +
+      '<div class="gate-onboarding" role="dialog" aria-label="Welcome to Aubade">' +
       '<div class="onb-card">' +
       '<button class="onb-close" type="button" aria-label="Close" disabled>' + I('x') + '</button>' +
       '<div class="onb-inner">' +
       '<div class="onb-ico">' + I('sparkle') + '</div>' +
-      '<h1 class="onb-h">Welcome to Octave</h1>' +
+      '<h1 class="onb-h">Welcome to Aubade</h1>' +
       '<p class="onb-p">Warm up your recommendations before the first play — so day-one shuffle ' +
       'already sounds like you.</p>' +
       '<div class="onb-choices">' +

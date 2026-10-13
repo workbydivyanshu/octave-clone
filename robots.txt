@@ -108,6 +108,6 @@ Allow: /
 Disallow: /app
 Disallow: /api
 
-Host: https://octavestreaming.com
-Sitemap: https://octavestreaming.com/sitemap.xml
-Sitemap: https://octavestreaming.com/sitemap-images.xml
+Host: https://workbydivyanshu.github.io
+Sitemap: https://workbydivyanshu.github.io/octave-clone/sitemap.xml
+Sitemap: https://workbydivyanshu.github.io/octave-clone/sitemap-images.xml

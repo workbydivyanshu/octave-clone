@@ -1,5 +1,5 @@
 // Aubade YTM data layer: guest-only YouTube Music via the aubade-stream worker.
-// Shapes map 1:1 onto OCTAVE_DATA track {id,title,artist,album,albumId,dur} +
+// Shapes map 1:1 onto AUBADE_DATA track {id,title,artist,album,albumId,dur} +
 // workerUrl in localStorage overriding the built-in production default; if the
 // worker is unreachable every streaming surface renders its designed empty
 // state (never fake content).

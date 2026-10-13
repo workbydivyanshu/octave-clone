@@ -3,7 +3,7 @@
    Automatically created chapters note, Information table. */
 (function () {
   'use strict';
-  var OCT = window.OCT, D = window.OCTAVE_DATA;
+  var OCT = window.OCT, D = window.AUBADE_DATA;
   var I = window.OCT_ICON, A = window.OCT_ART, $ = OCT.$, esc = OCT.esc;
 
   var ctx = OCT.init({ active: 'podcasts' });

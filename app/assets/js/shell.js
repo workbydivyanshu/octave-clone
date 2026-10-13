@@ -1,10 +1,10 @@
-/* Octave demo clone — shared app shell: sidebar, topbar, player bar,
+/* Aubade demo clone — shared app shell: sidebar, topbar, player bar,
    queue panel, Now Playing surface, context menus, shortcuts dialog,
    keyboard handling, toasts, and the library/search helpers. */
 (function (root) {
   'use strict';
 
-  var D = root.OCTAVE_DATA;
+  var D = root.AUBADE_DATA;
   var P = root.OCT_PLAYER;
   var I = root.OCT_ICON;
   var A = root.OCT_ART;
@@ -175,7 +175,7 @@
       '<div class="side-head">' +
       '<a class="brand" href="index.html">' +
       '<img class="brand-mark" src="assets/brand/white_logo.png" alt="" width="22" height="22">' +
-      '<span>Octave</span></a>' +
+      '<span>Aubade</span></a>' +
       '<button class="collapse-btn" id="collapseBtn" aria-label="Collapse sidebar" title="Collapse sidebar">' +
       I('panelLeft') + '</button>' +
       '</div>' +
@@ -194,7 +194,7 @@
       '<span class="pin-sub">Pinned · Playlist</span></span></a>' +
       '</div>' +
       '<div class="side-foot">' +
-      '<div class="made-by">Made by <b>CloakGPT</b></div>' +
+      '<div class="made-by">Made by <b>Aubade</b></div>' +
       '</div>' +
       '</nav>');
   }
@@ -797,7 +797,7 @@
       '</div>' +
       '<div style="margin-top:8px;border-top:1px solid var(--color-line);padding-top:14px">' +
       '<h3 style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--color-faint);margin-bottom:6px">' +
-      'Music shortcuts with no Octave equivalent · 28</h3>' +
+      'Music shortcuts with no Aubade equivalent · 28</h3>' +
       '<div class="t-sm muted">Rename Track…, Duplicate, Get Album Artwork, Import…, Library Preferences, ' +
       'Play Library Music, Show/Hide Sidebar, Show/Hide Status Bar, Show/Hide Toolbar and Control Strip, ' +
       'Update Song Rating, Get Song Menu, Show Current Song Menu, Show Main Menu, Show View Menu, and more from Music.app.</div>' +

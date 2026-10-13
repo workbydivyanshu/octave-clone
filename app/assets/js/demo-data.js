@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Octave demo clone — inline demo dataset.
+   Aubade demo clone — inline demo dataset.
    Authored from the recon copy dumps (copy/*.txt). No network calls, no
    third-party artwork, no API keys of any kind. Cover art is generated at
    runtime (see art.js) from a deterministic per-item gradient + initials.
@@ -402,7 +402,7 @@
         { l: 'Skip forward', c: ['Ctrl', 'Alt', '→'], alt: ['Shift', '→'] },
         { l: 'Skip backward', c: ['Ctrl', 'Alt', '←'], alt: ['Shift', '←'] },
         { l: 'Go to Current Song', c: ['Ctrl', 'Win', 'L'], alt: ['Ctrl', 'L'],
-          note: '⌘L is the address bar in every browser, so Octave uses ⌃⌘L.' },
+          note: '⌘L is the address bar in every browser, so Aubade uses ⌃⌘L.' },
         { l: 'Increase Volume', c: ['Ctrl', '↑'], alt: ['Shift', '↑'] },
         { l: 'Set Volume to Maximum', c: ['Ctrl', 'Shift', '↑'] },
         { l: 'Decrease Volume', c: ['Ctrl', '↓'], alt: ['Shift', '↓'] },
@@ -412,7 +412,7 @@
         { l: 'Repeat', c: ['R'] },
         { l: 'Back', c: ['Ctrl', '['] },
         { l: 'Next Item (Forward)', c: ['Ctrl', ']'], alt: ['Ctrl', 'Shift', ']'],
-          note: '⇧⌘] switches tabs in every browser, so Octave uses ⌘] — the browser’s own Forward.' }
+          note: '⇧⌘] switches tabs in every browser, so Aubade uses ⌘] — the browser’s own Forward.' }
       ]
     },
     {
@@ -426,7 +426,7 @@
     {
       g: 'HELP', rows: [
         { l: 'Keyboard Shortcuts', c: ['?'], alt: ['Ctrl', '?'],
-          note: '⌘? is the macOS Help menu in every app, so Octave uses ?' }
+          note: '⌘? is the macOS Help menu in every app, so Aubade uses ?' }
       ]
     },
     {
@@ -536,7 +536,7 @@
     'More to Explore': ['Heat Waves', 'Sunflower', 'Savage Love', 'Savage Love']
   };
 
-  root.OCTAVE_DEMO_DATA = {
+  root.AUBADE_DEMO_DATA = {
     tracks: tracks,
     trackById: tracks.reduce(function (m, t) { m[t.id] = t; return m; }, {}),
     albums: albums,

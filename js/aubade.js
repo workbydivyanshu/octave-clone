@@ -1,5 +1,5 @@
 /* ============================================================================
- * Octave — static clone behaviour.
+ * Aubade — static clone behaviour.
  * Plain ES5-ish script, no modules, no CDN: works from file:// and offline.
  *
  * Replaces the original GSAP + ScrollTrigger + Lenis stack:
@@ -7,7 +7,7 @@
  *   scrub      -> rAF loop reading scroll progress + exponential catch-up
  *   timeline   -> 40-line tween runner below (same positions/durations/eases)
  *   SplitText  -> walkText() word/char splitter
- *   WebAudio   -> octave-audio section, a faithful port of the captured synth
+ *   WebAudio   -> aubade-audio section, a faithful port of the captured synth
  * ========================================================================== */
 (function () {
   'use strict';

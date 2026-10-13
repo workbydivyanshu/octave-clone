@@ -59,7 +59,7 @@ async function journeySearchPlay(browser) {
     const rows = Array.from(document.querySelectorAll('[data-track-row]'));
     const live = rows.filter(function (r) {
       const id = r.querySelector('[data-play]').getAttribute('data-play');
-      const t = window.OCTAVE_DATA.trackById[id];
+      const t = window.AUBADE_DATA.trackById[id];
       return t && t.source === 'ytm';
     });
     const el = (live[0] || rows[0]).querySelector('[data-play]');

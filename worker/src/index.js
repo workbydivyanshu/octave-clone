@@ -1,4 +1,4 @@
-// Aubade stream worker: guest-only YouTube Music relay for the Octave web app.
+// Aubade stream worker: guest-only YouTube Music relay for the Aubade web app.
 // Client constants verified against Metrolist's shipped innertube module (GPL-3.0),
 // ~/GitHub/Metrolist/innertube/.../YouTubeClient.kt, read 2026-10-10.
 
@@ -29,10 +29,11 @@ function isAllowedStreamHost(rawUrl) {
   }
 }
 
-const CACHE = {
-  '/search': 600, '/suggest': 3600, '/home': 3600, '/charts': 3600,
-  '/album': 86400, '/artist': 86400, '/playlist': 86400, '/player': 0,
-};
+// Catalogue routes cached at the edge (full URL as key) for 1h to stay inside
+// Cloudflare's free 100k req/day. /player + /stream stay uncached: their
+// payloads carry single-use signed URLs. /health is never cached.
+const CACHEABLE = new Set(['/search', '/suggest', '/home', '/charts', '/album', '/artist', '/playlist']);
+const CACHE_TTL = 3600;
 
 function ctx(client, visitorData) {
   return {
@@ -319,9 +320,16 @@ async function handle(request, env) {
   const path = url.pathname;
   const v = visitor(request);
 
+  const cacheable = CACHEABLE.has('/' + path.split('/')[1]);
   const cacheKey = new Request(url, request);
-  const cached = await caches.default.match(cacheKey);
-  if (cached) return cached;
+  if (cacheable) {
+    const cached = await caches.default.match(cacheKey);
+    if (cached) {
+      const hitHeaders = new Headers(cached.headers);
+      hitHeaders.set('X-Aubade-Cache', 'hit');
+      return new Response(await cached.arrayBuffer(), { status: cached.status, headers: hitHeaders });
+    }
+  }
 
   let body, status = 200;
   try {
@@ -376,11 +384,15 @@ async function handle(request, env) {
     body = { error: String(e.message || e) };
   }
 
-  const res = new Response(JSON.stringify(body), {
-    status,
-    headers: { ...CORS, 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=' + (CACHE[path.split('/')[1] ? '/' + path.split('/')[1] : path] ?? 0) },
-  });
-  if (status === 200 && (CACHE[path] ?? CACHE['/' + path.split('/')[1]] ?? 0) > 0) {
+  const resHeaders = { ...CORS, 'Content-Type': 'application/json; charset=utf-8' };
+  if (cacheable) {
+    resHeaders['Cache-Control'] = 'public, max-age=' + CACHE_TTL;
+    resHeaders['X-Aubade-Cache'] = 'miss';
+  } else {
+    resHeaders['Cache-Control'] = 'public, max-age=0';
+  }
+  const res = new Response(JSON.stringify(body), { status, headers: resHeaders });
+  if (cacheable && status === 200) {
     await caches.default.put(cacheKey, res.clone());
   }
   return res;

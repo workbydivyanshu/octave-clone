@@ -1,4 +1,4 @@
-/* Octave demo clone — deterministic generated cover art.
+/* Aubade demo clone — deterministic generated cover art.
    No third-party artwork is bundled or hotlinked: every tile is drawn from
    CSS gradients + typography seeded by a stable hash of the item id/title. */
 (function (root) {

@@ -1,12 +1,12 @@
-// Aubade data facade: assigns window.OCTAVE_DATA synchronously (shell.js reads
+// Aubade data facade: assigns window.AUBADE_DATA synchronously (shell.js reads
 // it at eval), then AUB_BOOT.start() upgrades the SAME object in place with the
 // real sources — IndexedDB library, YTM shelves via the worker — before the
 // page's view script is injected. The demo dataset survives only as the
-// labeled fallback when no real source exists; OCTAVE_DATA.mode names it.
+// labeled fallback when no real source exists; AUBADE_DATA.mode names it.
 (function (root) {
   'use strict';
 
-  var demo = root.OCTAVE_DEMO_DATA || null;
+  var demo = root.AUBADE_DEMO_DATA || null;
   var D = demo ? JSON.parse(JSON.stringify(demo)) : {
     tracks: [], trackById: {}, albums: [], artists: [], playlists: [],
     stations: [], genres: [], moodCategories: [], searchCategories: [],
@@ -14,7 +14,7 @@
     trending: [], newMusic: [], cities: [], editorialShelves: [], storefronts: [],
   };
   D.mode = 'booting';
-  root.OCTAVE_DATA = D;
+  root.AUBADE_DATA = D;
 
   root.AUB_BOOT = {
     data: D,

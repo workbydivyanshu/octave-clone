@@ -1,6 +1,6 @@
-# Octave web player — static demo clone
+# Aubade web player — static demo clone
 
-A dependency-free, build-step-free, static reconstruction of the Octave web player
+A dependency-free, build-step-free, static reconstruction of the Aubade web player
 (`music.octavestreaming.com`), built from the read-only recon in
 `/tmp/octave-app-recon/`.
 
@@ -86,9 +86,8 @@ the real app's `/library/local` route.
   Settings. Shortcuts suspend while typing in a field.
 * **Settings** — all 19 sections with working toggles, segmented controls, sliders,
   a 10-band EQ with 23 presets + Manual and ±12 dB preamp, and settings search.
-* **Gates** — the members-only overlay and the onboarding warm-up dialog are
-  reproduced verbatim as **faithful, deliberately inert UI**. No Discord OAuth, no
-  Turnstile, no challenge is ever attempted.
+* **Gates** — the get-app panel and the onboarding warm-up dialog. Every button
+  points at a real Aubade artifact (Flatpak manifest, source repo, web player).
 
 ## What is mocked / non-functional (honest list)
 

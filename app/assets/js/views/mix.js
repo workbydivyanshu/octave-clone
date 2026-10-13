@@ -2,7 +2,7 @@
 // imported local tracks plus live YTM picks — shuffled and playable in one tap.
 (function () {
   'use strict';
-  var OCT = window.OCT, D = window.OCTAVE_DATA, P = window.OCT_PLAYER;
+  var OCT = window.OCT, D = window.AUBADE_DATA, P = window.OCT_PLAYER;
   var I = window.OCT_ICON, A = window.OCT_ART, $ = OCT.$, esc = OCT.esc, fmt = OCT.fmt;
 
   var ctx = OCT.init({ active: 'radio' });

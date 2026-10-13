@@ -1,5 +1,5 @@
 /* ============================================================================
-   Octave clone — glue stylesheet.
+   Aubade clone — glue stylesheet.
    Everything visual lives in the three vendored sheets:
      fonts.css    self-hosted Mona Sans / JetBrains Mono / Inter @font-face
      tailwind.css compiled Tailwind v4 output (the site's own stylesheet)
@@ -78,8 +78,8 @@
 .v2-wall-hot.v2-wall-hot-on { display: block; }
 
 /* --------------------------------------------------------- about marquee */
-.v2-about-strip { animation: octave-marquee 44s linear infinite; will-change: transform; }
-@keyframes octave-marquee {
+.v2-about-strip { animation: aubade-marquee 44s linear infinite; will-change: transform; }
+@keyframes aubade-marquee {
   from { transform: translate3d(0, 0, 0); }
   to   { transform: translate3d(-50%, 0, 0); }
 }

@@ -1,4 +1,4 @@
-/* Octave demo clone — inline SVG icons (lucide-style geometry, authored locally). */
+/* Aubade demo clone — inline SVG icons (lucide-style geometry, authored locally). */
 (function (root) {
   'use strict';
 

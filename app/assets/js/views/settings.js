@@ -3,7 +3,7 @@
    account-gated Turnstile panel rendered as faithful non-functional UI. */
 (function () {
   'use strict';
-  var OCT = window.OCT, D = window.OCTAVE_DATA, P = window.OCT_PLAYER;
+  var OCT = window.OCT, D = window.AUBADE_DATA, P = window.OCT_PLAYER;
   var I = window.OCT_ICON, A = window.OCT_ART, $ = OCT.$, esc = OCT.esc;
 
   var ctx = OCT.init({ active: '' });
@@ -129,7 +129,7 @@
     panel('audio', 'speaker', 'Audio',
       setRow('Audio Quality', 'Full-length streaming · higher quality uses more data.', seg('quality', ['Low', 'High', 'Lossless'])) +
       '<div class="setting" style="padding-top:0"><div class="faint t-sm">' +
-      'MP3 · 320 kbps · streamed from Octave</div></div>' +
+      'MP3 · 320 kbps · streamed from Aubade</div></div>' +
       setRow('Data Saver', 'Lightest audio quality + lower-resolution artwork. Web-only — the app has Cellular Streaming instead.', toggle('dataSaver')) +
       setRow('Sound Check', 'Real-time loudness matching so every track plays at a consistent level.', toggle('soundCheck')) +
       setRow('Song Transitions', 'No crossfade between songs (gapless still removes silence).', seg('transitions', ['Off', 'Crossfade', 'AutoMix']))) +
@@ -177,7 +177,7 @@
       setRow('Feed Source', 'Worldwide charts and editorial.', seg('feedSource', ['Apple Music', 'Deezer'])) +
       setRow('Only Shuffle in My Language', 'Autoplay, Smart Shuffle and radio pull in songs to match. Turn off to hear the whole catalog.', seg('language',
         ['English', 'Spanish', 'Portuguese', 'French', 'German', 'Italian', 'Hindi', 'Japanese', 'Korean', 'Arabic', 'More'])) +
-      '<div class="setting"><div class="faint t-sm">Instrumentals and titles Octave can’t ' +
+      '<div class="setting"><div class="faint t-sm">Instrumentals and titles Aubade can’t ' +
       'confidently classify still play — the filter only drops tracks it clearly hears as another language.</div></div>' +
       setRow('Tune Your Taste', 'Add more artists to seed your recommendations — never removes what’s already there.',
         '<button class="btn btn-glass">Add artists</button>')) +
@@ -213,7 +213,7 @@
       setRow('Hi-Res Artwork', 'Use the sharpest available cover art, with an automatic fallback.', toggle('hires')) +
       setRow('Liquid Glass', 'Frosted, refracting chrome. Auto keeps it off on devices that can’t afford the blur. Web-only.', seg('glass', ['Auto', 'Always', 'Off'])) +
       sliderRow('Visualizer Energy', 'How expressive the sound-wave bars are · 100%', 'vizEnergy', 100) +
-      setRow('Customize & Themes', 'Themes are set in the iOS app and follow your account. The web app uses the Octave theme.', seg('theme', ['Octave']))) +
+      setRow('Customize & Themes', 'Themes are set in the iOS app and follow your account. The web app uses the Aubade theme.', seg('theme', ['Aubade']))) +
 
     panel('gestures', 'hand', 'Gestures',
       setRow('Swipe Gestures', 'Swipe the mini player or artwork to change songs.', toggle('swipeGestures')) +
@@ -233,7 +233,7 @@
       }).join('') + '</div></div>') +
 
     panel('listening-history', 'trend', 'Listening History',
-      setRow('Octave Wrapped', 'Your listening, wrapped into a story', '<a class="btn btn-glass" href="wrapped.html">Open</a>') +
+      setRow('Aubade Wrapped', 'Your listening, wrapped into a story', '<a class="btn btn-glass" href="wrapped.html">Open</a>') +
       setRow('Listening Stats', 'Your top artists, songs and minutes', '<a class="btn btn-glass" href="stats.html">Open</a>')) +
 
     panel('connections', 'link', 'Connections',
@@ -246,14 +246,14 @@
       '<button class="btn btn-glass">' + I('key') + 'Log in with Last.fm</button>' +
       '<button class="btn btn-glass">' + I('user') + 'Connect by username</button></div></div>' +
       '<div class="setting" style="flex-direction:column;align-items:flex-start;gap:12px">' +
-      '<div><div class="setting-label">Support Octave</div>' +
-      '<div class="setting-help">Octave is free forever — no ads, no paywalls, no tracking. If it’s made ' +
-      'your day, a small crypto tip keeps the lights on. Handled through the sibling CloakGPT treasury.</div></div>' +
+      '<div><div class="setting-label">Support Aubade</div>' +
+      '<div class="setting-help">Aubade is free forever — no ads, no paywalls, no tracking. If it’s made ' +
+      'your day, a small crypto tip keeps the lights on. Handled in the open on GitHub.</div></div>' +
       '<div class="faint t-xs" style="word-break:break-all">' + esc(prefs.tips) + '</div></div>') +
 
     panel('about', 'info', 'About',
-      setRow('Backend', 'api.octavestreaming.com', '<span class="faint">— demo clone, no calls</span>') +
-      setRow('Audio', 'Octave Streaming', '<span class="faint">WebAudio demo tone</span>') +
+      setRow('Backend', 'aubade-stream worker', '<span class="faint">— guest YTM relay</span>') +
+      setRow('Audio', 'Aubade Streaming', '<span class="faint">WebAudio demo tone</span>') +
       setRow('Version', 'v7.3.2', '<span class="faint">demo build</span>') +
       setRow('Full-Length Streaming', 'Up to lossless FLAC from a global catalog; geo-locked tracks fall back to a 30-second preview.', '') +
       '<div class="setting"><div class="faint t-sm">Catalog region: Canada</div></div>') +

@@ -3,7 +3,7 @@
    Top by city, Browse moods & genres. */
 (function () {
   'use strict';
-  var OCT = window.OCT, D = window.OCTAVE_DATA, P = window.OCT_PLAYER;
+  var OCT = window.OCT, D = window.AUBADE_DATA, P = window.OCT_PLAYER;
   var I = window.OCT_ICON, A = window.OCT_ART, $ = OCT.$, esc = OCT.esc, fmt = OCT.fmt;
 
   var ctx = OCT.init({ active: 'home' });
@@ -97,7 +97,7 @@
       : hero('al-habibti', '', '#1 Today', 'Solar Eclipse', 'Drake', 'album.html?a=al-habibti')) +
     hero('pl-liked', '', 'Your Library', 'Liked Songs', 'Playlist', 'library.html?tab=playlists') +
     hero('ps-lightbox', '', 'Listen', 'Podcasts', 'Shows and episodes', 'podcasts.html') +
-    hero('pl-wrapped', '', '’26', 'Octave Wrapped', 'Replay what you played', 'wrapped.html') +
+    hero('pl-wrapped', '', '’26', 'Aubade Wrapped', 'Replay what you played', 'wrapped.html') +
     '</div></section>' +
 
     (quick
