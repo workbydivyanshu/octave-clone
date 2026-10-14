@@ -41,7 +41,7 @@
       '<div class="gate-right">' +
       '<div class="gate-rh">Get Aubade</div>' +
       '<div class="gate-rs">Three real artifacts. Pick one.</div>' +
-      '<a class="gate-cta" href="https://github.com/workbydivyanshu/aubade/blob/main/aubade/flatpak/dev.aubade.Aubade.yml" target="_blank" rel="noopener noreferrer">' +
+      '<a class="gate-cta" href="https://github.com/workbydivyanshu/aubade/blob/main/flatpak/dev.aubade.Aubade.yml" target="_blank" rel="noopener noreferrer">' +
       'Get the Flatpak manifest ↗</a>' +
       '<a class="gate-link" href="https://github.com/workbydivyanshu/aubade" target="_blank" rel="noopener noreferrer" style="margin-top:20px">' +
       'Browse the source ↗</a>' +
